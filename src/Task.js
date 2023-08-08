@@ -5,7 +5,7 @@ import { userContext } from './ReactDom';
 const ToDo = () => {
 
 
-   const [user, setUser] = useContext(userContext);
+const [user, setUser] = useContext(userContext);
     const [todo, setTodo] = useState({
         task: ""
     })
@@ -16,31 +16,18 @@ const ToDo = () => {
     //  console.log(user);
     const Input = (e) => {
         const { name, value } = e.target;
-        console.log(name,value);
+        // console.log(name,value);
         setTodo({ ...todo, [name]: value })
     }
-    // const fetchData = () => {
-    //    axios.get('http://localhost:8800/api/todo', {
-    //         params: { userid: user.id }
-    //     }).then(res => {
-    //         console.log(res.data);
-    //         setRead(res.data.data);
-    //     }).catch(err => {
-    //         console.log(err);
-    //         setRead([]);
-    //     });
-
-    
-
-    // }
+   
     const fetchData = async () => {
         try {
-            console.log(user.id);
+            // console.log(user.id);
           const res = await axios.get('http://localhost:8800/api/todo', {
           
             params: { userid: user.id }
           });
-          console.log("Data fetched:", res.data.data);
+        //   console.log("Data fetched:", res.data.data);
           setRead(res.data.data);
         }
          catch (err) {
@@ -65,16 +52,32 @@ const ToDo = () => {
                 url: "http://localhost:8800/api/todo",
                 data: { userid: user.id, task: todo.task }
             })
+            // console.log(task);
             
         }
         catch (e) {
             console.log(e);
-        }    console.log(read)
+        }  
+        //   console.log(read);
         fetchData();
         setTodo({ task: "" });
     }
 
-    const deletetask=()=>{
+    const deletetask=async(key)=>{
+        try{
+            //  console.log("hello",key);
+            const deletedtask= await axios({
+                method: "delete",
+                url: "http://localhost:8800/api/todo",
+                 params: { _id:key }
+            })
+            console.log(deletedtask);
+             fetchData();
+
+        }catch(e){
+            console.log(e);
+
+        }
 
     }
 
@@ -82,9 +85,7 @@ const ToDo = () => {
         if(e.target.tagName==="LI"){
             e.target.classList.toggle("checked");
         }
-            else if(e.target.tagName==="SPAN"){
-              deletetask();
-            }
+            
     }
 
 
@@ -92,11 +93,11 @@ const ToDo = () => {
 
     return (
         <>
-        <div class="container">
+        <div className="container">
             <form action="">
             
-           <div class="to-do">
-                <h2>My Todo-s  <i class="fa-solid fa-square-check"></i></h2>
+           <div className="to-do">
+                <h2>My Todo-s  <i className="fa-solid fa-square-check"></i></h2>
             <div class="row">
                 <input type="text"  className="inputtask" placeholder="Add Your Task here!" value={todo.task} onChange={Input} name="task"/>
                 <button onClick={handleSubmit} className='btn'>Add</button>
@@ -107,10 +108,10 @@ const ToDo = () => {
                  
                   
 
-                      read.map((element, key) => {
+                      read.map((element,key) => {
                           return (
-                              <li key="element._id">{element.task}
-                              <span>&times;</span>
+                              <li key={key}>{element.task}
+                              <span onClick={()=>deletetask(element._id)}>&times;</span>
                               </li>
 
                           )
